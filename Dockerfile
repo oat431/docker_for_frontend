@@ -1,21 +1,15 @@
-FROM node:carbon as node
+FROM node:12.14-alpine
 
-WORKDIR /app
+RUN mkdir -p /usr/src/app
 
-COPY package*.json /app/
+WORKDIR /usr/src/app
 
-RUN npm install
+COPY ./package.json /usr/src/app
 
-COPY ./ /app/
+RUN  npm install;
 
-ARG TARGET=ng-deploy-dev
+COPY ./ /usr/src/app
 
-RUN npm run ${TARGET}
+EXPOSE 4200
 
-FROM nginx:1.13
-
-COPY --from=node /app/dist/ /usr/share/nginx/html
-
-COPY ./nginx-custom.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
+CMD ["npm", "start"]
