@@ -1,15 +1,21 @@
-FROM node:latest as build
+FROM node:carbon as node
 
-WORKDIR /usr/local/app
+WORKDIR /app
 
-COPY ./ /usr/local/app/
+COPY package*.json /app/
 
 RUN npm install
 
-RUN npm run build
+COPY ./ /app/
 
-FROM nginx:latest
+ARG TARGET=ng-deploy-dev
 
-COPY --from=build /usr/local/app/dist/camt-foriegn-affair-angular /usr/share/nginx/html
+RUN npm run ${TARGET}
+
+FROM nginx:1.13
+
+COPY --from=node /app/dist/ /usr/share/nginx/html
+
+COPY ./nginx-custom.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
