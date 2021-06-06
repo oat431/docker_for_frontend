@@ -1,15 +1,15 @@
-FROM node:12.14-alpine
+FROM node:latest as build
 
-RUN mkdir -p /usr/src/app
+WORKDIR /usr/local/app
 
-WORKDIR /usr/src/app
+COPY ./ /usr/local/app/
 
-COPY ./package.json /usr/src/app
+RUN npm install
 
-RUN  npm install;
+RUN npm run build
 
-COPY ./ /usr/src/app
+FROM nginx:latest
 
-EXPOSE 4200
+COPY --from=build /usr/local/app/dist/camt-foriegn-affair-angular /usr/share/nginx/html
 
-CMD ["npm", "start"]
+EXPOSE 80
